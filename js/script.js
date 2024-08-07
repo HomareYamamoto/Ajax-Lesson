@@ -1,13 +1,33 @@
-$('#tab-contents .tab[id != "tab1"]').hide();
-// id="tab-contents"の要素のうち、 class="tab"であり、id="tab1"ではない要素が非表示になります。
-$('#tab-menu a').on('click', function(event) {
-  $("#tab-contents .tab").hide();
-  // id="tab-contents"内のいずれかのタブがクリックされたときに、そのタブ内の全コンテンツをいったん非表示
-  $("#tab-menu .active").removeClass("active");
-  // removeClass()は、クラス属性が設定されているHTML要素から、クラスを削除するメソッドであるため今回はActiveクラスを削除
-  $(this).addClass("active");
-  // .addClass()は、任意のHTML要素にクラス属性を追加できるメソッドであるためctiveが追加対象のクラスとして指定されています。
-  $($(this).attr("href")).show();
-  // タブがクリックされたときに.attr()メソッドで取得したhref属性を表示するように記述
-  event.preventDefault();
+// （API_KEY には、"取得したAPIキー" を記述）
+const API_KEY = "ABCDE";
+// 天気情報APIキーはメモ帳へ保存しているものかhttps://openweathermap.org/からAPIキーを取得して上行のABCDEのところへコピペする必要あり
+
+$(function(){
+  $('#btn').on('click', function() {
+    // 入力された都市名でWebAPIに天気情報をリクエスト
+    $.ajax({
+      url: "https://api.openweathermap.org/data/2.5/weather?q=" + $('#cityname').val() + "&units=metric&appid=" + API_KEY,
+      dataType : 'jsonp',
+    }).done(function (data){
+      //通信成功
+      // 位置
+      $('#place').text(data.name);
+      // 最高気温
+      $('#temp_max').text(data.main.temp_max);
+      // 最低気温
+      $('#temp_min').text(data.main.temp_min);
+      //湿度
+      $('#humidity').text(data.main.humidity);
+      //風速
+      $('#speed').text(data.wind.speed);
+      // 天気
+      $('#weather').text(data.weather[0].main);
+      // 天気アイコン
+      $('img').attr("src","http://openweathermap.org/img/w/" + data.weather[0].icon + ".png");
+      $('img').attr("alt",data.weather[0].main);
+    }).fail(function (data) {
+      //通信失敗
+      alert('通信に失敗しました。');
+      });
+  });
 });
